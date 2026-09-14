@@ -1,3 +1,9 @@
 body {
+  font-family: var(--font-urbanist);
   background-color: var(--black-color);
+  display: flex;
+}
+
+body.no-scroll {
+  overflow: hidden;
 }

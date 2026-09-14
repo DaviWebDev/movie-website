@@ -2,11 +2,18 @@
 import "../style/reset.css";
 import "../style/variabless.css";
 import "../style/global.css";
-import Head from "../components/Head.astro";
+import HeadContent from "../components/HeadContent.astro";
+import Header from "../components/Header.astro";
+
+const { title, description } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
-  <Head title="Home" description="Welcome to Movion Home, check your favorite genres movies." />
-  <body></body>
+  <head>
+    <HeadContent title={title} description={description} />
+  </head>
+  <body>
+    <Header />
+  </body>
 </html>

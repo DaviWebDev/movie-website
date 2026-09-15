@@ -1,0 +1,52 @@
+---
+import Layout from "../layouts/Layout.astro";
+import errorBackground from "../assets/images/404-Space.png";
+---
+
+<Layout title="404 error" description="Error 404 page" showHeader={false}>
+  <section class="not-found" style={`--bg-url: url(${errorBackground.src})`}>
+    <a class="btn-home" href="/">
+      Go Home
+    </a>
+  </section>
+</Layout>
+
+<style>
+  .not-found {
+    width: 100%;
+    min-height: 100dvh;
+    background-image: var(--bg-url);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .btn-home {
+    background-color: rgba(0, 0, 0, 0.548);
+    font-size: var(--font-size-lg);
+    font-weight: 200;
+    text-decoration: none;
+    color: var(--white-color);
+    padding: 0.5rem 1.5rem;
+    border: 1px solid var(--white-color);
+    margin-bottom: 10rem;
+    transform: scale(1);
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease,
+      transform 0.3s ease;
+  }
+
+  .btn-home:hover {
+    background-color: white;
+    color: var(--black-color);
+    border: 1px solid black;
+    transform: scale(1.05);
+  }
+
+  .btn-home:active {
+    transform: scale(0.95);
+  }
+</style>

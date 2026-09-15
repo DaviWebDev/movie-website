@@ -1,5 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
+import HeaderLogo from "../assets/logo/logo-header.svg";
 ---
 
 <header class="side-header">
@@ -15,7 +16,7 @@ import { Icon } from "astro-icon/components";
   </button>
 
   <a href="/" class="side-header__logo" aria-label="Movion - Home Page">
-    Movion
+    <HeaderLogo />
   </a>
 
   <nav class="side-header__navigation" id="primary-navigation" data-js="navigation-bar">
@@ -56,7 +57,7 @@ import { Icon } from "astro-icon/components";
     top: 0;
     left: 0;
     background: transparent;
-    min-width: 4rem;
+    width: 4rem;
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
@@ -109,13 +110,12 @@ import { Icon } from "astro-icon/components";
   }
 
   .side-header__logo {
-    font-family: var(--font-azonix);
-    font-size: var(--font-size-lg);
-    color: var(--white-color);
-    writing-mode: vertical-rl;
-    text-orientation: upright;
     text-decoration: none;
     display: none;
+  }
+
+  .side-header__logo svg {
+    height: 11rem;
   }
 
   .side-header__navigation {
@@ -178,17 +178,18 @@ import { Icon } from "astro-icon/components";
 
   @media (width >= 48rem) {
     .side-header {
-      position: relative;
+      position: sticky;
+      height: 100dvh;
     }
 
     .side-header::after {
       content: "";
       position: absolute;
-      top: 15rem;
+      top: 16rem;
       right: 0;
       transform: translateY(-50%);
       width: 1px;
-      height: 28.5rem;
+      height: 30rem;
       background-color: var(--white-color);
       box-shadow: 0 0 8px 1px rgba(255, 255, 255, 0.623);
       border-radius: var(--radius-full);

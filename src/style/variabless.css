@@ -1,6 +1,7 @@
 :root {
   --font-urbanist: "urbanist-variable-font", sans-serif;
   --font-azonix: "Azonix", "Azonix Fallback", sans-serif;
+  --font-bebas-neue: "Bebas Neue", "Bebas Neue Regular", sans-serif;
   --black-color: black;
   --white-color: white;
   --dark-blue-color: #0a1021;
@@ -25,6 +26,12 @@
   --radius-sm: 0.5rem;
   --radius-md: 1rem;
   --radius-full: 999px;
+  --default-level: 0;
+  --low-level: 1;
+  --secondary-low-level: 2;
+  --medium-level: 100;
+  --secondary-medium-level: 101;
+  --absolute-level: 999;
 }
 
 @font-face {
@@ -33,6 +40,17 @@
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
+}
+
+@font-face {
+  font-family: "Bebas Neue";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    local("Bebas Neue Regular"),
+    local("Bebas Neue"),
+    url("/fonts/BebasNeue-400.woff2") format("woff2");
 }
 
 @font-face {

@@ -1,0 +1,210 @@
+---
+import Image from "../components/Image.astro";
+import { fetchHomeData, backdropMovie, movieComplements } from "../js/services/api.ts";
+
+const dataMovies = await fetchHomeData();
+const { popularMovie } = dataMovies;
+const { id, backdrop_path: backdrop, title, overview } = popularMovie;
+
+const backdropOptimized = await backdropMovie(backdrop);
+const { streamings, logoData } = await movieComplements(id);
+---
+
+<section class="featured-banner" aria-label="Featured movies">
+  <div class="featured-banner__providers">
+    {streamings.length > 0
+      ? streamings.map((s) => (
+          <a href={`/${s.name}`} class="providers__link" aria-label={s.name}>
+            <Image path={`${s.logo}`} type="logo" alt="" width={50} height={50} loading="eager" />
+          </a>
+        ))
+      : null}
+  </div>
+  <div class="featured-banner__movie-logo">
+    {logoData?.url && (
+      <Image
+        path={logoData.url}
+        alt={`Logo movie ${title}`}
+        type="logo"
+        loading="eager"
+        layout="none"
+        width={logoData.width}
+        height={logoData.height}
+        className="movie-logo-img"
+      />
+    )}
+    <h2 class="movie-logo-fallback" hidden={!!logoData?.url}>
+      {title}
+    </h2>
+  </div>
+  <div class="featured-banner__overview">
+    <p>{overview}</p>
+  </div>
+  <div class="featured-banner__btn-area">
+    <a class="featured-banner__btn featured-banner__btn--play" href="/watch">
+      Play
+    </a>
+    <a class="featured-banner__btn featured-banner__btn--trailer" href="/trailer">
+      Watch Trailer
+    </a>
+  </div>
+</section>
+
+<style define:vars={{ url: `url(${backdropOptimized.src})` }}>
+  .featured-banner {
+    background-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.3) 30%, rgba(0, 0, 0, 0.3) 100%), var(--url);
+    background-size: cover;
+    background-position: top;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 30rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    gap: var(--space-md);
+    padding: 0 1.5rem;
+    overflow: hidden;
+  }
+
+  .featured-banner__providers {
+    display: flex;
+    gap: var(--space-md);
+  }
+
+  .providers__link {
+    width: 3rem;
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+  }
+
+  .providers__link :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .featured-banner__movie-logo {
+    width: clamp(8rem, 50dvw, 15rem);
+  }
+
+  .featured-banner__movie-logo :global(img) {
+    max-width: 100%;
+    max-height: 6rem;
+    width: auto;
+    height: auto;
+  }
+
+  .movie-logo-fallback {
+    font-family: var(--font-bebas-neue);
+    font-size: var(--font-size-xl);
+    font-weight: 800;
+    letter-spacing: 0.3rem;
+    line-height: 2.5rem;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9);
+    max-width: 15rem;
+  }
+
+  .featured-banner__overview {
+    max-width: clamp(18rem, 50dvw, 28rem);
+  }
+
+  .featured-banner__overview p {
+    font-family: var(--font-urbanist);
+    font-size: var(--font-size-base);
+    line-height: 1.2rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    user-select: none;
+  }
+
+  .featured-banner__btn-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+  }
+
+  .featured-banner__btn--play,
+  .featured-banner__btn--trailer {
+    font-size: var(--font-size-md);
+    color: var(--white-color);
+    text-decoration: none;
+    width: clamp(6rem, 50dvw, 8rem);
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+  }
+
+  .featured-banner__btn--play {
+    background-color: #640005;
+    border: 2px solid #be0010;
+    border-radius: 1rem 0.2rem 1rem 0.2rem;
+  }
+
+  @media (width >= 48rem) {
+    .featured-banner {
+      position: relative;
+      background-image: var(--url);
+      justify-content: center;
+    }
+
+    .featured-banner::before {
+      content: "";
+      position: absolute;
+      inset: -2px; /* ← em vez de inset: 0 */
+      background:
+        linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%);
+      pointer-events: none;
+      z-index: var(--default-level);
+    }
+
+    .featured-banner__providers {
+      z-index: var(--low-level);
+    }
+
+    .featured-banner__movie-logo {
+      z-index: var(--low-level);
+    }
+
+    .featured-banner__overview {
+      z-index: var(--low-level);
+    }
+
+    .featured-banner__btn-area {
+      justify-content: start;
+      gap: var(--space-3xl);
+      z-index: var(--low-level);
+    }
+
+    .featured-banner__btn--play,
+    .featured-banner__btn--trailer {
+      font-size: 1.3rem;
+    }
+  }
+</style>
+
+<script>
+  const THRESHOLD = 4;
+
+  document.querySelectorAll<HTMLImageElement>(".movie-logo-img").forEach((img) => {
+    const check = () => {
+      const ratio = img.naturalWidth / img.naturalHeight;
+      if (ratio > THRESHOLD) {
+        img.hidden = true;
+        const fallback = img.parentElement?.querySelector<HTMLElement>(".movie-logo-fallback");
+        if (fallback) fallback.hidden = false;
+      }
+    };
+
+    if (img.complete) check();
+    else img.addEventListener("load", check);
+  });
+</script>

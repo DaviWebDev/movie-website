@@ -63,8 +63,7 @@ import HeaderLogo from "../assets/logo/logo-header.svg";
     flex-direction: column;
     align-items: center;
     gap: var(--space-xl);
-    padding-top: var(--space-md);
-    z-index: 101;
+    z-index: var(--secondary-medium-level);
   }
 
   .side-header:has(.side-header__navigation--open) {
@@ -82,13 +81,12 @@ import HeaderLogo from "../assets/logo/logo-header.svg";
   .side-header__toggle {
     background-color: rgba(0, 0, 0, 0.5);
     width: 100%;
-    height: 2rem;
+    height: 3rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: var(--space-sm);
     transition: background-color 0.3s ease;
     border: none;
     cursor: pointer;
@@ -166,7 +164,7 @@ import HeaderLogo from "../assets/logo/logo-header.svg";
     -webkit-backdrop-filter: blur(2px);
     backdrop-filter: blur(2px);
     pointer-events: none;
-    z-index: 100;
+    z-index: var(--medium-level);
   }
 
   .overlay.isVisible {

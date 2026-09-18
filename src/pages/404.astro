@@ -3,7 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import errorBackground from "../assets/images/404-Space.png";
 ---
 
-<Layout title="404 error" description="Error 404 page" showHeader={false}>
+<Layout title="404 error" description="Error 404 page not found" showHeader={false}>
   <section class="not-found" style={`--bg-url: url(${errorBackground.src})`}>
     <a class="btn-home" href="/">
       Go Home
@@ -37,6 +37,7 @@ import errorBackground from "../assets/images/404-Space.png";
       background-color 0.3s ease,
       color 0.3s ease,
       transform 0.3s ease;
+    user-select: none;
   }
 
   .btn-home:hover {

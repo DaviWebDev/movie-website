@@ -1,19 +1,15 @@
 ---
-import Image from "../components/Image.astro";
-import { fetchHomeData, backdropMovie, movieComplements } from "../js/services/api.ts";
+import Image from "../Image.astro";
 
-const dataMovies = await fetchHomeData();
-const { popularMovie } = dataMovies;
-const { id, backdrop_path: backdrop, title, overview } = popularMovie;
-
-const backdropOptimized = await backdropMovie(backdrop);
-const { streamings, logoData } = await movieComplements(id);
+const { data, bannerBackdrop, complements } = Astro.props;
+const { title, overview } = data;
+const { streamings, logoData } = complements;
 ---
 
 <section class="featured-banner" aria-label="Featured movies">
   <div class="featured-banner__providers">
     {streamings.length > 0
-      ? streamings.map((s) => (
+      ? streamings.map((s: any) => (
           <a href={`/${s.name}`} class="providers__link" aria-label={s.name}>
             <Image path={`${s.logo}`} type="logo" alt="" width={50} height={50} loading="eager" />
           </a>
@@ -50,7 +46,7 @@ const { streamings, logoData } = await movieComplements(id);
   </div>
 </section>
 
-<style define:vars={{ url: `url(${backdropOptimized.src})` }}>
+<style define:vars={{ url: `url(${bannerBackdrop.src})` }}>
   .featured-banner {
     background-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.3) 30%, rgba(0, 0, 0, 0.3) 100%), var(--url);
     background-size: cover;

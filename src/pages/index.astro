@@ -1,8 +1,16 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import FeaturedBanner from "../components/FeaturedBanner.astro";
+import FeaturedBanner from "../components/home/FeaturedBanner.astro";
+import { fetchHomeData, backdropMovieOptimized, movieComplements } from "../js/services/api.js";
+
+const dataMovies = await fetchHomeData();
+const { genres, upcoming, popularMovie } = dataMovies;
+const { id, backdrop_path } = popularMovie;
+
+const bannerBackdrop = await backdropMovieOptimized(backdrop_path);
+const bannerComplements = await movieComplements(id);
 ---
 
-<Layout title="Home" description="Welcome to Movion Home, check your favorite genres movies.">
-  <FeaturedBanner />
+<Layout title="Home Movion" description="Welcome to Movion Home, check your favorite genres movies.">
+  <FeaturedBanner data={popularMovie} bannerBackdrop={bannerBackdrop} complements={bannerComplements} />
 </Layout>

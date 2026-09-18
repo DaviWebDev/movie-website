@@ -26,7 +26,7 @@ export async function fetchHomeData(): Promise<HomeData> {
   return { popularMovie, genres: genreMovies, upcoming };
 }
 
-export async function backdropMovie(path: string | null) {
+export async function backdropMovieOptimized(path: string | null) {
   const backdropUrl = `https://image.tmdb.org/t/p/w1280${path}`;
   return getImage({
     src: backdropUrl,

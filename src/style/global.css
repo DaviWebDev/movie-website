@@ -2,10 +2,5 @@ body {
   background-color: var(--black-color);
   font-family: var(--font-urbanist);
   color: var(--white-color);
-  display: flex;
-  gap: var(--space-3xl);
-}
-
-body.no-scroll {
-  overflow: hidden;
+  user-select: none;
 }

@@ -1,0 +1,47 @@
+---
+import HeaderFooter from "../assets/logo/logo-footer.svg";
+---
+
+<footer class="footer">
+  <a href="/" class="footer__logo" aria-label="Movion">
+    <HeaderFooter />
+  </a>
+  <span>All right reserved </span>
+  <span>Terms of Use | Privacy Policy</span>
+</footer>
+
+<style>
+  .footer {
+    width: 100%;
+    height: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+  }
+
+  .footer__logo :global(svg) {
+    width: clamp(5rem, 30vw, 8rem);
+  }
+
+  .footer span:nth-child(2) {
+    display: none;
+  }
+
+  .footer span {
+    font-size: clamp(var(--font-size-xs), 4vw, var(--font-size-md));
+  }
+
+  @media (width >= 48rem) {
+    .footer {
+      justify-content: initial;
+      gap: var(--space-3xl);
+    }
+    .footer__logo {
+      flex: 1;
+    }
+    .footer span:nth-child(2) {
+      display: inline-block;
+    }
+  }
+</style>

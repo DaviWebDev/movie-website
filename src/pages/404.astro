@@ -3,11 +3,15 @@ import Layout from "../layouts/Layout.astro";
 import errorBackground from "../assets/images/404-Space.png";
 ---
 
-<Layout title="404 error" description="Error 404 page not found" showHeader={false}>
+<Layout title="404 error" description="Error 404 page not found" showHeader={false} showFooter={false}>
   <section class="not-found" style={`--bg-url: url(${errorBackground.src})`}>
-    <a class="btn-home" href="/">
-      Go Home
-    </a>
+    <div class="not-found__content">
+      <h2>OOPS!</h2>
+      <p>PAGE NOT FOUND</p>
+      <a class="btn-home" href="/">
+        Go Home
+      </a>
+    </div>
   </section>
 </Layout>
 
@@ -15,12 +19,31 @@ import errorBackground from "../assets/images/404-Space.png";
   .not-found {
     width: 100%;
     min-height: 100dvh;
+    box-sizing: border-box;
     background-image: var(--bg-url);
     background-size: cover;
     background-position: center;
     display: flex;
     align-items: flex-end;
     justify-content: center;
+    padding: 0 1rem clamp(3rem, 15vh, 10rem);
+  }
+
+  .not-found__content {
+    display: flex;
+    flex-direction: column;
+    place-items: center;
+    gap: var(--space-lg);
+  }
+
+  .not-found__content h2 {
+    font-family: var(--font-azonix);
+    font-size: clamp(2.5rem, 12vw, var(--font-size-3xl));
+  }
+
+  .not-found__content p {
+    font-family: var(--font-azonix);
+    font-size: clamp(var(--font-size-sm), 5vw, var(--font-size-xl));
   }
 
   .btn-home {
@@ -31,13 +54,11 @@ import errorBackground from "../assets/images/404-Space.png";
     color: var(--white-color);
     padding: 0.5rem 1.5rem;
     border: 1px solid var(--white-color);
-    margin-bottom: 10rem;
     transform: scale(1);
     transition:
       background-color 0.3s ease,
       color 0.3s ease,
       transform 0.3s ease;
-    user-select: none;
   }
 
   .btn-home:hover {

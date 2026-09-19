@@ -4,8 +4,17 @@ import "../style/variabless.css";
 import "../style/global.css";
 import HeadContent from "../components/HeadContent.astro";
 import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
 
-const { title, description, showHeader = true } = Astro.props;
+interface Props {
+  title: string;
+  description: string;
+  showHeader?: boolean;
+  showFooter?: boolean;
+  mainClass?: string;
+}
+
+const { title, description, showHeader = true, showFooter = true, mainClass = "" } = Astro.props;
 ---
 
 <!doctype html>
@@ -15,10 +24,13 @@ const { title, description, showHeader = true } = Astro.props;
   </head>
   <body>
     <h1 class="sr-only">{title}</h1>
-    {showHeader && <Header />}
-    <main>
-      <slot />
-    </main>
+    <div class="page-shell">
+      {showHeader && <Header />}
+      <main class={mainClass}>
+        <slot />
+      </main>
+      {showFooter && <Footer />}
+    </div>
   </body>
 </html>
 
@@ -33,9 +45,43 @@ const { title, description, showHeader = true } = Astro.props;
     white-space: nowrap;
   }
 
+  .page-shell {
+    min-width: 0;
+    display: grid;
+    grid-template-areas: "main";
+  }
+
   main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    grid-area: main;
+    min-width: 0;
+  }
+
+  .page-shell > :global(.footer) {
+    grid-area: footer;
+  }
+
+  :global(.page-shell:has(> .footer)) {
+    grid-template-areas:
+      "main"
+      "footer";
+    gap: var(--space-xl);
+  }
+
+  @media (width >= 48rem) {
+    :global(.page-shell:has(> .side-header):has(> .footer)) {
+      grid-template-columns: 4rem minmax(0, 1fr);
+      grid-template-areas:
+        "header main"
+        "header footer";
+    }
+
+    :global(.page-shell:has(> .side-header):not(:has(> .footer))) {
+      grid-template-columns: 4rem minmax(0, 1fr);
+      grid-template-areas: "header main";
+    }
+
+    :global(.page-shell > .side-header) {
+      grid-area: header;
+    }
   }
 </style>

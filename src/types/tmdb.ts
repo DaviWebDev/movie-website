@@ -1,4 +1,4 @@
-interface TmdbMovie {
+export interface TmdbMovie {
   id: number;
   title: string;
   overview: string;
@@ -10,6 +10,13 @@ interface TmdbMovie {
   release_date: string;
   genre_ids: number[];
   media_type: string;
+}
+
+export type TmdbMoviePreview = Pick<TmdbMovie, "id" | "poster_path" | "title">;
+
+export interface MovieRowData {
+  title: string;
+  movies: TmdbMoviePreview[];
 }
 
 export interface TmdbResponse {
@@ -30,8 +37,9 @@ export interface TmdbGenreResponse {
 
 export interface HomeData {
   popularMovie: TmdbMovie;
-  genres: { name: string; movies: TmdbMovie[] }[];
-  upcoming: TmdbMovie[];
+  genres: MovieRowData[];
+  upcomingMovies: TmdbMoviePreview[];
+  recentMovies: TmdbMoviePreview[];
 }
 
 export interface Provider {

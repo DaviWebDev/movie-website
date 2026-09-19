@@ -2,28 +2,48 @@ import { API_KEY } from "../config";
 import type { HomeData, TmdbGenreResponse, TmdbResponse, Provider, Streaming } from "../../types/tmdb";
 import { getImage } from "astro:assets";
 
+const genreMap = ["Action", "Adventure", "Romance", "Horror", "Drama"];
+
+async function fetchMoviePages(endpoint: string, pageCount = 2): Promise<TmdbResponse["results"]> {
+  const responses = await Promise.all(Array.from({ length: pageCount }, (_, index) => fetch(`${endpoint}&page=${index + 1}`)));
+
+  const pages = await Promise.all(responses.map((response) => response.json() as Promise<TmdbResponse>));
+
+  return pages.flatMap(({ results }) => results);
+}
+
 export async function fetchHomeData(): Promise<HomeData> {
-  const [genresRes, upcomingRes, ...pages] = await Promise.all([
+  const [genresRes, upcomingData, recentMoviesData, movies] = await Promise.all([
     fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${API_KEY}`),
-    fetch(`https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}`),
-    ...[1, 2, 3, 4, 5].map((page) => fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&page=${page}`)),
+    fetchMoviePages(`https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}`),
+    fetchMoviePages(`https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}`),
+    fetchMoviePages(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`),
   ]);
 
   const { genres } = (await genresRes.json()) as TmdbGenreResponse;
-  const { results: upcoming } = (await upcomingRes.json()) as TmdbResponse;
-  const movieData = await Promise.all(pages.map((r) => r.json() as Promise<TmdbResponse>));
-  const movies = movieData.flatMap((d) => d.results);
 
   const popularMovie = movies.find((movie) => movie.backdrop_path && !movie.adult && movie.vote_average >= 6 && movie.vote_count >= 100)!;
+  const recentMovies = recentMoviesData.map(({ id, title, poster_path }) => ({ id, title, poster_path }));
+  const upcomingMovies = upcomingData.map(({ id, title, poster_path }) => ({ id, title, poster_path }));
 
-  const genreMovies = genres
-    .map((genre) => ({
-      name: genre.name,
-      movies: movies.filter((movie) => movie.genre_ids?.includes(genre.id)),
-    }))
-    .filter((genre) => genre.movies.length > 0);
+  const genreMovies = await Promise.all(
+    genres
+      .filter((genre) => genreMap.includes(genre.name))
+      .map(async (genre) => {
+        const results = await fetchMoviePages(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genre.id}`);
 
-  return { popularMovie, genres: genreMovies, upcoming };
+        return {
+          title: genre.name,
+          movies: results.map(({ id, title, poster_path }) => ({
+            id,
+            title,
+            poster_path,
+          })),
+        };
+      }),
+  );
+
+  return { popularMovie, genres: genreMovies, upcomingMovies, recentMovies };
 }
 
 export async function backdropMovieOptimized(path: string | null) {

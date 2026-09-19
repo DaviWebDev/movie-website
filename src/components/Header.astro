@@ -15,7 +15,7 @@ import HeaderLogo from "../assets/logo/logo-header.svg";
     <span class="side-header__toggle-bar"></span>
   </button>
 
-  <a href="/" class="side-header__logo" aria-label="Movion - Home Page">
+  <a href="/" class="side-header__logo" aria-label="Movion">
     <HeaderLogo />
   </a>
 
@@ -157,8 +157,6 @@ import HeaderLogo from "../assets/logo/logo-header.svg";
   .overlay {
     position: fixed;
     inset: 0;
-    width: 100dvw;
-    height: 100dvh;
     display: none;
     visibility: hidden;
     -webkit-backdrop-filter: blur(2px);
@@ -174,11 +172,16 @@ import HeaderLogo from "../assets/logo/logo-header.svg";
     pointer-events: auto;
   }
 
+  :global(body.no-scroll) {
+    overflow: hidden;
+  }
+
   @media (width >= 48rem) {
     .side-header {
       position: sticky;
       height: 100dvh;
       padding-top: var(--space-md);
+      margin-right: 0;
     }
 
     .side-header::after {

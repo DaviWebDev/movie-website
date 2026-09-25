@@ -1,0 +1,108 @@
+---
+import type { Provider } from "../../types/tmdb.ts";
+import Image from "../Image.astro";
+
+interface Props {
+  providers: Provider[];
+}
+
+const { providers } = Astro.props;
+const providersFiltered: Provider[] = [...providers].sort((a, b) => a.display_priority - b.display_priority).slice(0, 4);
+---
+
+<section class="movie-providers">
+  <div class="movie-providers__text">
+    <h2>Where To Watch:</h2>
+  </div>
+  <div class:list={["movie-providers__brand-providers", providersFiltered.length <= 0 && "movie-providers__brand-providers--unavailable"]}>
+    {providersFiltered.length > 0 ? (
+      providersFiltered.map((p) => (
+        <div class="movie-providers__brand-provider">
+          <Image path={p.logo_path} alt={p.provider_name} type="logo" loading="lazy" width={100} height={100} layout="none" />
+        </div>
+      ))
+    ) : (
+      <p>Not available to watch yet</p>
+    )}
+  </div>
+</section>
+
+<style>
+  .movie-providers {
+    background-color: rgba(10, 16, 33, 0.5);
+    width: min(100% - 4rem, 60rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-lg) var(--space-md);
+    border-radius: 2rem;
+  }
+
+  .movie-providers__text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
+  .movie-providers__text h2 {
+    font-size: var(--font-size-lg);
+  }
+
+  .movie-providers__text p {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .movie-providers__brand-providers {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .movie-providers__brand-provider :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .movie-providers__brand-providers::after {
+    position: absolute;
+    content: "";
+    background-color: white;
+    top: 50%;
+    left: 50%;
+    width: 1px;
+    height: 100%;
+    border-radius: var(--radius-md);
+    transform: translate(-50%, -50%);
+  }
+
+  .movie-providers__brand-providers--unavailable::after {
+    content: none;
+  }
+
+  @media (width >= 48rem) {
+    .movie-providers {
+      padding: var(--space-xl) var(--space-2xl);
+      justify-content: space-between;
+    }
+
+    .movie-providers__brand-providers {
+      display: flex;
+    }
+  }
+
+  @media (width >= 64rem) {
+    .movie-providers {
+      align-self: flex-start;
+      flex-direction: row;
+    }
+
+    .movie-providers__text {
+      align-items: start;
+    }
+  }
+</style>

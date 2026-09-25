@@ -6,9 +6,10 @@ import Image from "../Image.astro";
 interface Props {
   data: MovieRowData;
   loading?: "lazy" | "eager";
+  slugMap: Map<number, string>;
 }
 
-const { data, loading = "lazy" } = Astro.props;
+const { data, loading = "lazy", slugMap } = Astro.props;
 ---
 
 <section class="movie-row" aria-label=`${data.title} row`>
@@ -31,8 +32,8 @@ const { data, loading = "lazy" } = Astro.props;
       {data.movies.map(
         (movie) =>
           movie.poster_path && (
-            <a href={`/${movie.title}`} aria-label={movie.title} class="movie-row__card">
-              <Image path={movie.poster_path} alt={movie.title} type="poster" loading={loading} className="movie-row__poster-img" />
+            <a href={`/movie/${slugMap.get(movie.id)}`} aria-label={movie.title} class="movie-row__card">
+              <Image path={movie.poster_path} alt={movie.title} type="poster" loading={loading} />
             </a>
           ),
       )}
@@ -109,7 +110,7 @@ const { data, loading = "lazy" } = Astro.props;
     box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.2);
   }
 
-  :global(.movie-row__poster-img) {
+  .movie-row__card :global(img) {
     width: 100%;
     height: 100%;
     object-fit: contain;

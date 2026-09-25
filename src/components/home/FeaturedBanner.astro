@@ -1,7 +1,7 @@
 ---
 import Image from "../Image.astro";
 
-const { data, bannerBackdrop, complements } = Astro.props;
+const { data, bannerBackdrop, complements, slugMap } = Astro.props;
 const { title, overview } = data;
 const { streamings, logoData } = complements;
 ---
@@ -26,7 +26,7 @@ const { streamings, logoData } = complements;
         layout="none"
         width={logoData.width}
         height={logoData.height}
-        className="movie-logo-img"
+        fetchpriority="high"
       />
     )}
     <h2 class="movie-logo-fallback" hidden={!!logoData?.url}>
@@ -40,7 +40,7 @@ const { streamings, logoData } = complements;
     <a class="featured-banner__btn featured-banner__btn--play" href="/watch">
       Play
     </a>
-    <a class="featured-banner__btn featured-banner__btn--trailer" href="/trailer">
+    <a class="featured-banner__btn featured-banner__btn--trailer" href={`/movie/${slugMap.get(data.id)}`}>
       Watch Trailer
     </a>
   </div>
@@ -59,7 +59,7 @@ const { streamings, logoData } = complements;
     justify-content: end;
     gap: var(--space-md);
     padding: 0 1.5rem;
-    overflow: hidden;
+    overflow: clip;
   }
 
   .featured-banner__providers {
@@ -153,7 +153,7 @@ const { streamings, logoData } = complements;
     .featured-banner::before {
       content: "";
       position: absolute;
-      inset: -2px; /* ← em vez de inset: 0 */
+      inset: -2px;
       background:
         linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%),
         linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%);
@@ -189,7 +189,7 @@ const { streamings, logoData } = complements;
 <script>
   const THRESHOLD = 4;
 
-  document.querySelectorAll<HTMLImageElement>(".movie-logo-img").forEach((img) => {
+  document.querySelectorAll<HTMLImageElement>(".featured-banner__movie-logo img").forEach((img) => {
     const check = () => {
       const ratio = img.naturalWidth / img.naturalHeight;
       if (ratio > THRESHOLD) {

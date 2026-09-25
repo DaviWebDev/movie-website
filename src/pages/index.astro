@@ -2,8 +2,10 @@
 import Layout from "../layouts/Layout.astro";
 import MovieRow from "../components/home/MovieRow.astro";
 import FeaturedBanner from "../components/home/FeaturedBanner.astro";
-import { fetchHomeData, backdropMovieOptimized, movieComplements } from "../js/services/api.ts";
-import { filterUniqueMovies } from "../js/helpers/utils.ts";
+import { fetchHomeData, backdropMovieOptimized, movieComplements } from "../lib/services/api.ts";
+import { createSlugMap, filterUniqueMovies, getHomeMovies } from "../lib/helpers/utils.ts";
+
+export const prerender = false;
 
 const dataMovies = await fetchHomeData();
 const { genres, upcomingMovies, popularMovie, recentMovies } = dataMovies;
@@ -11,6 +13,9 @@ const { id, backdrop_path } = popularMovie;
 
 const bannerBackdrop = await backdropMovieOptimized(backdrop_path);
 const bannerComplements = await movieComplements(id);
+
+const slugMap = createSlugMap(getHomeMovies(dataMovies));
+
 const displayedMovieIds = new Set<number>();
 const rows = [{ title: "New This Week", movies: recentMovies }, ...genres, { title: "Coming Soon", movies: upcomingMovies }].map((row) => ({
   ...row,
@@ -18,10 +23,17 @@ const rows = [{ title: "New This Week", movies: recentMovies }, ...genres, { tit
 }));
 ---
 
-<Layout title="Home Movion" description="Welcome to Movion Home, check your favorite genres movies." mainClass="home-main">
-  <FeaturedBanner data={popularMovie} bannerBackdrop={bannerBackdrop} complements={bannerComplements} />
+<Layout
+  title="Home Movion"
+  description="Welcome to Movion Home, check your favorite genres movies."
+  mainClass="home-main"
+  backgroundPriority={bannerBackdrop}
+>
+  <FeaturedBanner data={popularMovie} bannerBackdrop={bannerBackdrop} complements={bannerComplements} slugMap={slugMap} />
   {rows.map((row, index) => (
-    <MovieRow data={row} loading={index < 2 ? "eager" : "lazy"} />
+    <>
+      <MovieRow data={row} loading={index < 2 ? "eager" : "lazy"} slugMap={slugMap} />
+    </>
   ))}
 </Layout>
 

@@ -1,0 +1,11 @@
+services:
+  movie-website:
+    build:
+      context: .
+      target: prod
+
+    env_file:
+      - .env
+
+    ports:
+      - "4322:4321"

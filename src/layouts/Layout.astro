@@ -12,19 +12,21 @@ interface Props {
   showHeader?: boolean;
   showFooter?: boolean;
   mainClass?: string;
+  backgroundPriority?: any;
 }
 
-const { title, description, showHeader = true, showFooter = true, mainClass = "" } = Astro.props;
+const { title, description, showHeader = true, showFooter = true, mainClass = "", backgroundPriority } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <HeadContent title={title} description={description} />
+    {backgroundPriority && <link rel="preload" as="image" href={backgroundPriority.src} fetchpriority="high" />}
   </head>
   <body>
     <h1 class="sr-only">{title}</h1>
-    <div class="page-shell">
+    <div class:list={["page-shell", { "page-shell--with-header": showHeader, "page-shell--with-footer": showFooter }]}>
       {showHeader && <Header />}
       <main class={mainClass}>
         <slot />
@@ -68,16 +70,12 @@ const { title, description, showHeader = true, showFooter = true, mainClass = ""
   }
 
   @media (width >= 48rem) {
-    :global(.page-shell:has(> .side-header):has(> .footer)) {
+    .page-shell.page-shell--with-header.page-shell--with-footer {
       grid-template-columns: 4rem minmax(0, 1fr);
       grid-template-areas:
         "header main"
         "header footer";
-    }
-
-    :global(.page-shell:has(> .side-header):not(:has(> .footer))) {
-      grid-template-columns: 4rem minmax(0, 1fr);
-      grid-template-areas: "header main";
+      column-gap: 1.5rem;
     }
 
     :global(.page-shell > .side-header) {

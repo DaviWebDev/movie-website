@@ -1,22 +1,39 @@
 ---
 import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
 
 interface Props {
-  path: string;
+  path: string | ImageMetadata;
   alt: string;
   size?: "w342" | "w500" | "w780" | "original";
   width?: number;
   height?: number;
-  type?: "poster" | "logo";
+  type?: "poster" | "logo" | "profile";
   loading?: "lazy" | "eager";
   layout?: "constrained" | "full-width" | "none";
-  className?: string;
+  source?: "tmdb" | "local";
+  fetchpriority?: "low" | "high" | "auto";
 }
 
-const { path, alt = "", size = "w500", type = "none", loading = "lazy", layout = "full-width", width, height, className } = Astro.props;
-const src = `https://image.tmdb.org/t/p/${type === "logo" ? "original" : size}${path}`;
+const {
+  path,
+  alt = "",
+  size = "w500",
+  type,
+  loading = "lazy",
+  layout = "full-width",
+  width,
+  height,
+  source = "tmdb",
+  fetchpriority = "auto",
+} = Astro.props;
+const src = source === "local" ? path : `https://image.tmdb.org/t/p/${type === "logo" ? "original" : size}${path}`;
 
 const dims = type === "poster" ? { width: 500, height: 750 } : { width: width!, height: height! };
 ---
 
-<Image src={src} alt={alt} {...dims} loading={loading} layout={layout} class={className} />
+{source === "local" ? (
+  <Image src={path as ImageMetadata} alt={alt} {...dims} loading={loading} layout={layout} />
+) : (
+  <Image src={src as string} alt={alt} {...dims} loading={loading} layout={layout} fetchpriority={fetchpriority} />
+)}

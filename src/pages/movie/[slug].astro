@@ -1,0 +1,54 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import MovieSummary from "../../components/details/MovieSummary.astro";
+import MovieTrailer from "../../components/details/MovieTrailer.astro";
+import StreamingProviders from "../../components/details/StreamingProviders.astro";
+import { backdropMovieOptimized, fetchHomeData, fetchMovieDetails } from "../../lib/services/api.ts";
+import { createSlugMap, filterMovieDetails, getHomeMovies } from "../../lib/helpers/utils.ts";
+
+export const prerender = false;
+Astro.response.headers.set("Cache-Control", "public, max-age=86400");
+
+const { slug } = Astro.params;
+
+const homeData = await fetchHomeData();
+const movies = getHomeMovies(homeData);
+const slugMap = createSlugMap(movies);
+
+const id = [...slugMap.entries()].find(([, s]) => s === slug)?.[0];
+
+if (!id) {
+  return new Response(null, { status: 404 });
+}
+
+const movieDetails = await fetchMovieDetails(id);
+const movie = filterMovieDetails(movieDetails);
+const backdropOptimized = await backdropMovieOptimized(movie.movie.backdrop_path ?? movie.movie.poster_path);
+---
+
+<Layout title={movieDetails.movie.title} description={`${movieDetails.movie.title} about`} mainClass="movie-main">
+  <MovieSummary movieData={movie.movie} prequel={movie.previousMovie} complements={movie.externalRatings} backdrop={backdropOptimized} />
+  <MovieTrailer trailer={movie.movie.trailer} />
+  <StreamingProviders providers={movie.movie.providers} />
+</Layout>
+
+<style>
+  :global(.movie-main) {
+    max-width: 113rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-3xl);
+  }
+
+  :global(.movie-hero__poster, .movie-hero__summary, .movie-hero__cast, .movie-hero__info-panel, .movie-trailer, .movie-providers) {
+    box-shadow: 0 0 10px 0 rgba(163, 223, 237, 0.25);
+  }
+
+  @media (width >= 113rem) {
+    :global(.movie-main) {
+      justify-content: start;
+    }
+  }
+</style>

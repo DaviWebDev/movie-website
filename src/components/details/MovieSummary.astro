@@ -1,0 +1,419 @@
+---
+import Image from "../Image.astro";
+import type { FilteredExternalRatings, FilteredMovieData } from "../../types/tmdb.ts";
+import { Icon } from "astro-icon/components";
+
+interface Props {
+  movieData: FilteredMovieData;
+  prequel: { title: string } | null;
+  complements: FilteredExternalRatings | null;
+  backdrop: any | null;
+}
+
+const { movieData, prequel, complements, backdrop } = Astro.props;
+const { title, overview, poster_path, tagline, genres, cast, director, logo } = movieData;
+const { released, ratings } = complements ?? { released: null, ratings: [] };
+const filteredCast = cast.slice(0, 3).map(({ name, role, photo }) => ({
+  name,
+  role,
+  photo,
+}));
+
+const avaliations = ["Internet Movie Database", "Rotten Tomatoes", "Metacritic"];
+---
+
+<section class="movie-hero">
+  <div class="movie-hero__visual">
+    <div class="movie-hero__poster">
+      {poster_path ? <Image path={poster_path} alt={title} type="poster" loading="eager" layout="none" /> : null}
+    </div>
+    <div class="movie-hero__branding">
+      {logo && (
+        <Image
+          path={logo.path}
+          alt={`Logo movie: ${title}`}
+          type="logo"
+          loading="eager"
+          layout="none"
+          width={logo.width}
+          height={logo.height}
+        />
+      )}
+      <h2 class="movie-hero__branding-fallback" hidden={!!logo}>
+        {title}
+      </h2>
+    </div>
+  </div>
+  <div class="movie-hero__content">
+    <div class="movie-hero__summary">
+      <p class="movie-hero__tagline">{tagline ? `"${tagline}"` : "Movie details:"}</p>
+      <div class="movie-hero__genres">{genres ? genres.map((genre) => <span class="genre-item">{genre.name}</span>) : null}</div>
+      <div class="movie-hero__overview">
+        <p>{overview}</p>
+      </div>
+    </div>
+    <div class="movie-hero__cast">
+      {filteredCast.map((actor) => {
+        return (
+          <article class="movie-hero__cast-card">
+            <div class="movie-hero__cast-photo">
+              {actor.photo ? (
+                <Image path={actor.photo} alt={`${actor.name}`} type="profile" width={128} height={128} layout="none" loading="lazy" />
+              ) : (
+                <Icon name="profile-circle" aria-label={actor.name} width={64} height={64} />
+              )}
+            </div>
+            <div class="movie-hero__cast-info">
+              <span>{actor.name}</span>
+              <span>{actor.role}</span>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+    <div class="movie-hero__details">
+      <div class="movie-hero__info-panel movie-hero__metadata">
+        {director.length > 0 && (
+          <div class:list={["movie-hero__metadata-item", !prequel && "movie-hero__metadata-item--border-none"]}>
+            <span>Director:</span>
+            <span>{director.map((person) => person.name).join(", ")}</span>
+          </div>
+        )}
+        {prequel && (
+          <div class="movie-hero__metadata-item">
+            <span>Prequel:</span>
+            <span>{prequel.title}</span>
+          </div>
+        )}
+      </div>
+      <div class="movie-hero__info-panel movie-hero__ratings-panel">
+        <div class:list={["movie-hero__release-date", ratings.length <= 0 && "movie-hero__release-date--border-none"]}>
+          <span>Release date:</span>
+          <span>{released}</span>
+        </div>
+        {ratings.length > 0 && (
+          <div class="movie-hero__ratings">
+            {ratings.map((a) => {
+              if (!avaliations.includes(a.Source)) return null;
+              let criticLogoName = "";
+              if (a.Source === "Internet Movie Database") {
+                criticLogoName = "imdb";
+              }
+              if (a.Source === "Rotten Tomatoes") {
+                criticLogoName = "tomatoes";
+              }
+              if (a.Source === "Metacritic") {
+                criticLogoName = "metacritic";
+              }
+              return (
+                <div class="movie-hero__rating">
+                  <Icon
+                    name={`brands/${criticLogoName}`}
+                    aria-label={`${a.Source} logo`}
+                    width={30}
+                    height={30}
+                    class={`critic-logo critic-logo--${criticLogoName}`}
+                  />
+                  <span>{a.Source === "Internet Movie Database" ? "IMDb" : a.Source}</span>
+                  <span>{a.Value}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style define:vars={{ url: `url(${backdrop.src})` }}>
+  .movie-hero {
+    position: relative;
+    background-image:
+      linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.1) 100%),
+      linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 5) 30%, rgba(0, 0, 0, 0.1) 100%), var(--url);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-2xl);
+    padding-top: 8rem;
+    padding-bottom: 2rem;
+    overflow: clip;
+  }
+
+  .movie-hero__visual {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
+  .movie-hero__poster {
+    width: 16rem;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .movie-hero__branding {
+    width: 14rem;
+  }
+
+  .movie-hero__poster :global(img),
+  .movie-hero__branding :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .movie-hero__content {
+    width: min(100% - 4rem, 65rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-2xl);
+  }
+
+  .movie-hero__summary,
+  .movie-hero__cast,
+  .movie-hero__info-panel {
+    width: 100%;
+    background-color: rgba(10, 16, 33, 0.5);
+    padding: var(--space-lg) var(--space-md);
+    border-radius: 1.5rem;
+  }
+
+  .movie-hero__summary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .movie-hero__tagline {
+    font-size: clamp(1.2rem, 3vw, var(--font-size-xl));
+  }
+
+  .movie-hero__genres {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: clamp(0.75rem, 2vw, 1.25rem);
+  }
+
+  .genre-item {
+    background-color: rgba(10, 16, 33);
+    padding: clamp(var(--space-xs), 3vw, var(--space-sm));
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .movie-hero__overview {
+    font-size: clamp(var(--font-size-sm), 3vw, var(--font-size-md));
+    line-height: var(--font-size-lg);
+  }
+
+  .movie-hero__cast {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .movie-hero__cast-card {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  .movie-hero__cast-card:nth-child(n + 3) {
+    display: none;
+  }
+
+  .movie-hero__cast-photo {
+    flex: 0 0 4rem;
+    width: 4rem;
+    height: 4rem;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+  }
+
+  .movie-hero__cast-photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .movie-hero__cast-info {
+    font-size: var(--font-size-md);
+    line-height: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .movie-hero__details {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xl);
+  }
+
+  .movie-hero__info-panel {
+    flex: 1;
+  }
+
+  .movie-hero__metadata-item--border-none,
+  .movie-hero__release-date--border-none {
+    align-items: start;
+    border: none !important;
+    text-align: center;
+  }
+
+  .movie-hero__metadata {
+    font-size: var(--font-size-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .movie-hero__metadata-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .movie-hero__metadata-item:first-child {
+    border-bottom: 1px solid var(--white-color);
+    padding-bottom: var(--space-md);
+  }
+
+  .movie-hero__ratings-panel {
+    font-size: var(--font-size-base);
+    line-height: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .movie-hero__release-date,
+  .movie-hero__ratings {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .movie-hero__release-date {
+    font-size: var(--font-size-md);
+    border-bottom: 1px solid var(--white-color);
+    padding-bottom: var(--space-md);
+  }
+
+  .movie-hero__rating {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .movie-hero__rating span:last-child {
+    margin-inline-start: auto;
+  }
+
+  @media (width >= 48rem) {
+    .movie-hero {
+      padding-top: var(--space-3xl);
+      background-image: var(--url);
+    }
+
+    .movie-hero::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      background:
+        linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, 0.1) 100%),
+        linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 5) 20%, rgba(0, 0, 0, 0.1) 100%);
+      pointer-events: none;
+      z-index: var(--default-level);
+    }
+
+    .movie-hero__visual,
+    .movie-hero__content {
+      z-index: var(--low-level);
+    }
+
+    .movie-hero__cast {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .movie-hero__cast-card:nth-child(n + 3) {
+      display: flex;
+    }
+
+    .movie-hero__info-panel {
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-xl);
+    }
+
+    .movie-hero__metadata-item:first-child {
+      padding-inline-end: clamp(var(--space-md), 10vw, var(--space-xl));
+      border-inline-end: 1px solid var(--white-color);
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .movie-hero__metadata-item:last-child {
+      text-align: end;
+    }
+
+    .movie-hero__release-date {
+      padding-inline-end: clamp(var(--space-md), 10vw, var(--space-xl));
+      border-inline-end: 1px solid var(--white-color);
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .movie-hero__ratings {
+      gap: var(--space-xs);
+    }
+
+    .movie-hero__rating span:nth-child(2) {
+      margin-right: var(--space-xl);
+    }
+  }
+
+  @media (width >= 64rem) {
+    .movie-hero {
+      flex-direction: row;
+      justify-content: start;
+      align-items: start;
+      gap: var(--space-md);
+      padding-right: var(--space-md);
+    }
+  }
+
+  @media (width >= 80rem) {
+    .movie-hero {
+      gap: var(--space-2xl);
+    }
+
+    .movie-hero__summary,
+    .movie-hero__cast,
+    .movie-hero__info-panel {
+      background-color: rgba(10, 16, 33, 0.5);
+      padding: var(--space-md) var(--space-xl);
+      border-radius: 1.5rem;
+    }
+
+    .movie-hero__details {
+      flex-direction: row;
+      gap: var(--space-2xl);
+    }
+  }
+</style>

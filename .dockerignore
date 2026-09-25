@@ -1,4 +1,9 @@
 node_modules
 dist
 .git
-.astro
+.gitignore
+Dockerfile
+docker-compose.yml
+docker-compose.prod.yml
+npm-debug.log
+.env

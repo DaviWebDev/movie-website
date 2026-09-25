@@ -9,9 +9,14 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "docker:prod-up": "docker compose -f docker-compose.prod.yml up --build -d",
+    "docker:prod-down": "docker compose -f docker-compose.prod.yml down",
+    "docker:prod-build": "docker compose -f docker-compose.prod.yml build",
+    "docker:prod-build-clean": "docker compose -f docker-compose.prod.yml build --no-cache"
   },
   "dependencies": {
+    "@astrojs/node": "^11.1.6",
     "astro": "^7.3.2",
     "astro-icon": "^1.2.0"
   },

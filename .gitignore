@@ -22,3 +22,8 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Docker
+docker-compose.override.yml
+*.log
+.vercel
